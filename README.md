@@ -22,7 +22,7 @@ A web-based interactive Sudoku game built using **Flask (Python)** on the backen
 
 ## 🖼️ Screenshots
 
-![Sudoku Screenshot](https://your-screenshot-url-if-any.png)
+![Sudoku Game Screenshot](sudoku_screenshot.png)
 
 ---
 
