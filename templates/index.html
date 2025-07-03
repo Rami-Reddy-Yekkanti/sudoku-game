@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .main-content {
+            width: 70%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .game-container {
+            text-align: center;
+            background: white;
+            padding: 20px 40px;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 30%;
+            height: 100vh;
+            background: white;
+            border-left: 3px solid #333;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #77bafc;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: #000000;
+            margin-bottom: 10px;
+        }
+
+        .sudoku-grid {
+            display: inline-grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            border: 3px solid #333;
+            margin: 15px 0px 0px 0px;
+            gap: 0;
+        }
+
+        .sudoku-box {
+            display: inline-block;
+            border: 1px solid #333;
+        }
+
+        .sudoku-row {
+            display: flex;
+        }
+
+        .sudoku-cell {
+            width: 45px;
+            height: 45px;
+            border: 1.5px solid #a2a1a1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgb(255, 255, 255);
+        }
+
+        .sudoku-cell.initial {
+            background-color: #e6f3ff;
+            color: #0066cc;
+        }
+
+        .sudoku-cell.user-input {
+            background-color: #fff;
+            color: #333;
+        }
+
+        .sudoku-cell:hover:not(.initial) {
+            background-color: #58acff;
+        }
+
+        .sudoku-cell.selected {
+            background-color: #0066cc !important;
+        }
+
+        .number-pad {
+            margin: 0px 0px 0px 0px;
+        }
+
+        .number-btn {
+            width: 35px;
+            height: 35px;
+            margin: 0px;
+            font-size: 16px;
+            font-weight: bold;
+            border: 2px solid #333;
+            background: #ffffff;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .number-btn:hover {
+            background-color: #70a6f8;
+        }
+
+        .controls {
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            margin: 0px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn.reset {
+            background-color: #f44336;
+        }
+
+        .btn.reset:hover {
+            background-color: #da190b;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 5px solid;
+            font-size: 16px;
+        }
+
+        .message.success {
+            color: #000000;
+            border-left-color: #28a745;
+        }
+
+        .message.error {
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+
+        .message.win {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left-color: #ffc107;
+            font-weight: bold;
+        }
+
+        .message-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="game-container">
+
+            <!-- Title -->
+            <h1>🧩 Sudoku Game</h1>
+
+            <!-- Sudoku Empty Grid -->
+            <div id="sudoku-grid" class="sudoku-grid">
+            </div>
+
+            <!-- Number Pad -->
+            <div class="number-pad">
+                <br>
+                <button class="number-btn" onclick="inputNumber(1)">1</button>
+                <button class="number-btn" onclick="inputNumber(2)">2</button>
+                <button class="number-btn" onclick="inputNumber(3)">3</button>
+                <button class="number-btn" onclick="inputNumber(4)">4</button>
+                <button class="number-btn" onclick="inputNumber(5)">5</button>
+                <button class="number-btn" onclick="inputNumber(6)">6</button>
+                <button class="number-btn" onclick="inputNumber(7)">7</button>
+                <button class="number-btn" onclick="inputNumber(8)">8</button>
+                <button class="number-btn" onclick="inputNumber(9)">9</button>
+                <button class="number-btn" onclick="inputNumber(0)">X</button>
+            </div>
+
+            <!-- Reset Button -->
+            <div class="controls">
+                <button class="btn reset" onclick="reset_game_board()">Reset Game</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="sidebar">
+
+        <!-- Title -->
+        <h3>📋 Game Messages</h3>
+
+        <!-- Welcome Message -->
+        <div id="message-container" class="message-container">
+            <div class="message success">Welcome to Sudoku! Select a cell and enter a number.</div>
+        </div>
+    </div>
+
+    <script>
+        let selectedCell = null;
+        let board = [];
+        let initialCells = [];
+
+        // Load the Sudoku board from the server
+        function loadBoard() {
+            fetch('/get_board')
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    board = data.board;
+                    initialCells = data.initial_cells;
+                    renderBoard();
+                });
+                
+        }
+
+        // Render the entire Sudoku board
+        function renderBoard() {
+            const grid = document.getElementById('sudoku-grid');
+            grid.innerHTML = '';
+
+            // Loop through each 3x3 box
+            for (let boxRow = 0; boxRow < 3; boxRow++) {
+                for (let boxCol = 0; boxCol < 3; boxCol++) {
+                    let boxDiv = document.createElement('div');
+                    boxDiv.className = 'sudoku-box';
+
+                    // Loop through each row and column inside the box
+                    for (let cellRow = 0; cellRow < 3; cellRow++) {
+                        let rowDiv = document.createElement('div');
+                        rowDiv.className = 'sudoku-row';
+
+                        for (let cellCol = 0; cellCol < 3; cellCol++) {
+                            let row = boxRow * 3 + cellRow;
+                            let col = boxCol * 3 + cellCol;
+
+                            let cellDiv = document.createElement('div');
+                            cellDiv.className = 'sudoku-cell';
+
+                            // Store the row and col inside HTML
+                            cellDiv.dataset.row = row;
+                            cellDiv.dataset.col = col;
+
+                            // Get the number in the board
+                            let number = board[row][col];
+                            cellDiv.textContent = number === 0 ? '' : number;
+
+                            // Make it look different for original cells
+                            if (initialCells[row][col]) {
+                                cellDiv.classList.add('initial');
+                            } else {
+                                cellDiv.classList.add('user-input');
+                                cellDiv.addEventListener('click', function () {
+                                    selectCell(row, col);
+                                });
+                            }
+                            rowDiv.appendChild(cellDiv);
+                        }
+                        boxDiv.appendChild(rowDiv);
+                    }
+                    grid.appendChild(boxDiv);
+                }
+            }
+        }
+
+        // Called when a user clicks a cell
+        function selectCell(row, col) {
+            // Remove highlight from previously selected cell
+            let oldSelected = document.querySelector('.sudoku-cell.selected');
+            if (oldSelected) {
+                oldSelected.classList.remove('selected');
+            }
+
+            // Save the new selected cell position
+            selectedCell = { row: row, col: col };
+
+            // Highlight the clicked cell
+            let cellToHighlight = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            cellToHighlight.classList.add('selected');
+        }
+
+        // Called when the user clicks a number button
+        function inputNumber(number) {
+            // If no cell selected, show error
+            if (!selectedCell) {
+                showMessage('Please select a cell first!', 'error');
+                return;
+            }
+            let row = selectedCell.row;
+            let col = selectedCell.col;
+            
+            let moveData = {
+                row: row,
+                col: col,
+                value: number
+            };
+
+            // Send move to server
+            fetch('/make_move', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(moveData)
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.success) {
+                        board = data.board;
+                        renderBoard();
+                        if (data.game_won) {
+                            showMessage(data.message, 'win');
+                        } else {
+                            showMessage(data.message, 'success');
+                        }
+                    } else {
+                        showMessage(data.message, 'error');
+                    }
+                });
+        }
+
+        // Called when the "Reset Game" button is clicked
+        function reset_game_board(){
+            fetch('/reset_game', {method: 'POST'})
+            .then(function(response){
+                return response.json();
+            })
+            .then(function(data){
+                board = data.board;
+                selectCell = null;
+                renderBoard();
+                showMessage(data.message, 'success')
+            })
+        }
+
+        // Display a message in the sidebar
+        function showMessage(text, type) {
+            let container = document.getElementById('message-container');
+            let message = document.createElement('div');
+            message.className = 'message ' + type;
+
+            let currentTime = new Date().toLocaleTimeString();
+            message.innerHTML = `<strong>${currentTime}</strong><br>${text}`;
+
+            container.appendChild(message);
+
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+
+            // Keep only last 20 messages
+            if (container.children.length > 20) {
+                container.removeChild(container.children[0]);
+            }
+        }
+        // ✅ Run when page first loads
+        loadBoard();
+    </script>
+</body>
+</html>
