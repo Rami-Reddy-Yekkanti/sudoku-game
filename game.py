@@ -5,15 +5,15 @@ app = Flask(__name__)
 app.secret_key = 'sudoku_game_secret_key'
 
 # Initial board state
-INITIAL_BOARD = np.array([[0, 0, 3, 6, 8, 5, 4, 7, 0],
-                          [5, 0, 0, 0, 0, 4, 1, 6, 2],
-                          [7, 0, 0, 0, 1, 9, 5, 3, 8],
-                          [0, 0, 0, 9, 0, 0, 0, 0, 0],
-                          [3, 9, 0, 0, 0, 1, 0, 2, 0],
-                          [0, 6, 5, 0, 0, 3, 0, 0, 1],
-                          [4, 0, 0, 0, 6, 0, 9, 0, 3],
-                          [9, 0, 0, 3, 4, 2, 0, 8, 7],
-                          [0, 0, 0, 1, 0, 0, 0, 0, 4]])
+INITIAL_BOARD = np.array([[0, 0, 0, 8, 0, 0, 6, 0, 2],
+                          [6, 4, 0, 5, 0, 7, 0, 0, 0],
+                          [8, 0, 7, 0, 6, 0, 0, 0, 0],
+                          [4, 9, 6, 3, 0, 2, 1, 0, 7],
+                          [2, 0, 0, 4, 7, 0, 0, 9, 6],
+                          [7, 5, 3, 9, 0, 0, 0, 0, 4],
+                          [1, 0, 0, 2, 0, 9, 0, 0, 0],
+                          [0, 6, 0, 7, 0, 0, 0, 0, 0],
+                          [0, 7, 4, 0, 5, 1, 9, 2, 0]])
 
 def initialize_board():
     return INITIAL_BOARD.copy()
@@ -164,6 +164,8 @@ def reset_game_server_side():
     }
     return jsonify(response_data)
 
-# Run the server
+# Run the server\
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
