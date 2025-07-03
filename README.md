@@ -4,10 +4,6 @@
 
 A web-based interactive Sudoku game built using **Flask (Python)** on the backend and **HTML/CSS/JavaScript** on the frontend. Play, reset, and solve Sudoku puzzles with intuitive UI and live validation of moves!
 
----
-
-## 🌐 Live Demo
-
 👉 Try it here: [sudoku-game-t2nu.onrender.com](https://sudoku-game-t2nu.onrender.com)
 
 ---
