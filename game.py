@@ -20,31 +20,22 @@ def initialize_board():
 
 # Sudoku Rule Validations
 def is_valid_row(board, row_number, value):
-    for i in range(9):
-        if board[row_number][i] == value:
-            return False
-    return True
+    return value not in board[row_number]
 
 def is_valid_column(board, column_number, value):
-    for i in range(9):
-        if board[i][column_number] == value:
-            return False
-    return True
+    return value not in board[:,column_number]
 
 def is_valid_box(board, row_number, column_number, value):
-    row_start = row_number - (row_number % 3)
-    col_start = column_number - (column_number % 3)
-    for i in range(3):
-        for j in range(3):
-            if board[row_start + i][col_start + j] == value:
-                return False
-    return True
+    row_start = row_number - row_number % 3
+    col_start = column_number - column_number % 3
+    box = board[row_start:row_start+3, col_start:col_start+3]
+    return value not in box
 
 def is_board_complete(board):
     return not np.any(board == 0)
 
 def is_initial_cell(row, col):
-    return INITIAL_BOARD[row][col] != 0
+    return INITIAL_BOARD[row, col] != 0
 
 # ---------------------------------------------------------------------------------------------------------------
 # Home Page Route
@@ -72,7 +63,6 @@ def get_board():
             [bool(is_initial_cell(i, j)) for j in range(9)] for i in range(9)
         ]
     }
-    
     return jsonify(board_data)
 
 
